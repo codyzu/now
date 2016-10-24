@@ -55,26 +55,62 @@ const aliases = new Map([
   ['secret', 'secrets']
 ])
 
-let cmd = argv._[0]
-let args = []
+let args = process.argv.slice(2)
+let cmd = defaultCommand
 
-if (cmd === 'help') {
-  cmd = argv._[1]
+let cmdIndex
+for (const [arg, index] of args.entries()) {
+  if (commands.has(arg)) {
+    cmd = arg
+    args.splice(index, 1)
 
-  if (!commands.has(cmd)) {
-    cmd = defaultCommand
+    if (arg === 'help') {
+      if (index + 1 < args.length && commands.has(args[index + 1])) {
+        cmd = args[index + 1]
+        args.splice(index, 2)
+      } else {
+        cmd = ['deploy', '--help']
+        args.splice(index, 1)
+      }
+    } else {
+      cmd = arg
+      args.splice(index, 1)
+    }
+
+    break
   }
-
-  args.push('--help')
 }
 
-if (commands.has(cmd)) {
-  cmd = aliases.get(cmd) || cmd
-  args = args.concat(process.argv.slice(3))
-} else {
-  cmd = defaultCommand
-  args = args.concat(process.argv.slice(2))
+function handleHelp (index) {
+  if (index + 1 < args.length && commands.has(args[index + 1])) {
+    cmd = [args[index + 1], '--help']
+    args.splice(index, 2)
+  } else {
+    cmd = ['deploy', '--help']
+    args.splice(index, 1)
+  }
 }
+
+// let cmd = argv._[0]
+// let args = []
+//
+// if (cmd === 'help') {
+//   cmd = argv._[1]
+//
+//   if (!commands.has(cmd)) {
+//     cmd = defaultCommand
+//   }
+//
+//   args.push('--help')
+// }
+//
+// if (commands.has(cmd)) {
+//   cmd = aliases.get(cmd) || cmd
+//   args = args.concat(process.argv.slice(3))
+// } else {
+//   cmd = defaultCommand
+//   args = args.concat(process.argv.slice(2))
+// }
 
 let bin = resolve(__dirname, 'now-' + cmd)
 if (process.pkg) {
