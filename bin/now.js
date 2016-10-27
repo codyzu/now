@@ -57,8 +57,8 @@ const aliases = new Map([
 ])
 
 let cmd = defaultCommand
-let args = process.argv.slice(2)
-let index = args.findIndex((arg) => commands.has(arg))
+const args = process.argv.slice(2)
+const index = args.findIndex(commands.has)
 
 if (index > -1) {
   cmd = args[index]
