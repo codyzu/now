@@ -84,8 +84,6 @@ if (process.pkg) {
   bin = process.execPath
 }
 
-console.log('CMD:', bin, 'ARGS:', args)
-
 const proc = spawn(bin, args, {
   stdio: 'inherit',
   customFds: [0, 1, 2]
