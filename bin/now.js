@@ -29,6 +29,7 @@ const defaultCommand = 'deploy'
 
 const commands = new Set([
   defaultCommand,
+  'help',
   'list',
   'ls',
   'rm',
@@ -59,8 +60,11 @@ let args = process.argv.slice(2)
 let cmd = defaultCommand
 
 let cmdIndex
-for (const [arg, index] of args.entries()) {
+console.log('HELLO')
+for (const [index, arg] of args.entries()) {
+  console.log('TESTING:', arg)
   if (commands.has(arg)) {
+    console.log('CMD FOUND:', arg, 'INDEX:', index)
     cmd = arg
     args.splice(index, 1)
 
@@ -69,25 +73,17 @@ for (const [arg, index] of args.entries()) {
         cmd = args[index + 1]
         args.splice(index, 2)
       } else {
-        cmd = ['deploy', '--help']
+        cmd = defaultCommand
         args.splice(index, 1)
       }
+
+      args.unshift('--help')
     } else {
       cmd = arg
       args.splice(index, 1)
     }
 
     break
-  }
-}
-
-function handleHelp (index) {
-  if (index + 1 < args.length && commands.has(args[index + 1])) {
-    cmd = [args[index + 1], '--help']
-    args.splice(index, 2)
-  } else {
-    cmd = ['deploy', '--help']
-    args.splice(index, 1)
   }
 }
 
@@ -118,10 +114,14 @@ if (process.pkg) {
   bin = process.execPath
 }
 
-const proc = spawn(bin, args, {
-  stdio: 'inherit',
-  customFds: [0, 1, 2]
-})
-
-proc.on('close', code => exit(code))
-proc.on('error', () => exit(1))
+console.log('CMD:', bin)
+console.log('ARGS:', args)
+//
+//
+// const proc = spawn(bin, args, {
+//   stdio: 'inherit',
+//   customFds: [0, 1, 2]
+// })
+//
+// proc.on('close', code => exit(code))
+// proc.on('error', () => exit(1))
