@@ -113,6 +113,7 @@
     "gulp-ext": "1.0.0",
     "gulp-task-listing": "1.0.1",
     "pkg": "3.0.0-beta.14",
+    "simple-mock": "0.7.0",
     "xo": "0.17.0"
   }
 }
