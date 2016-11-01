@@ -1,33 +1,88 @@
 import test from 'ava'
 import {spawn} from 'cross-spawn'
-import {join} from 'path'
+import path from 'path'
 
-test.cb('dsafdf', t => {
-  // t.plan(1)
-  // const command = path.join(__dirname, '../bin/now')
-  // const command = 'pwd'
-  const command = 'node'
-  const args = ['-r', 'babel-register', '../bin/now', '--help']
-  // const args = ['--help']
-  const now = spawn(command, args)
+const deployHelpMessage = '𝚫 now [options] <command | path>'
+const aliasHelpMessage = '𝚫 now alias <ls | set | rm> <deployment> <alias>'
 
-  now.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`);
-  });
+test('"now help" prints deploy help message', async t => {
+  const result = await now('help')
 
-  now.stderr.on('data', (data) => {
-    console.log(`stderr: ${data}`);
-  });
-
-  now.on('error', (err) => {
-    console.log(`error: ${err}`)
-    t.fail(err)
-    // console.log(`stderr: ${data}`);
-  });
-
-  now.on('close', (code) => {
-    console.log(`child process exited with code ${code}`);
-    t.pass();
-    t.end()
-  });
+  t.is(result.code, 0)
+  const stdout = result.stdout.split('\n')
+  t.true(stdout.length > 1)
+  t.true(stdout[1].includes(deployHelpMessage))
 })
+
+test('"now --help" prints deploy help message', async t => {
+  const result = await now('--help')
+
+  t.is(result.code, 0)
+  const stdout = result.stdout.split('\n')
+  t.true(stdout.length > 1)
+  t.true(stdout[1].includes(deployHelpMessage))
+})
+
+test('"now deploy --help" prints deploy help message', async t => {
+  const result = await now('deploy', '--help')
+
+  t.is(result.code, 0)
+  const stdout = result.stdout.split('\n')
+  t.true(stdout.length > 1)
+  t.true(stdout[1].includes(deployHelpMessage))
+})
+
+test('"now --help deploy" prints deploy help message', async t => {
+  const result = await now('--help', 'deploy')
+
+  t.is(result.code, 0)
+  const stdout = result.stdout.split('\n')
+  t.true(stdout.length > 1)
+  t.true(stdout[1].includes(deployHelpMessage))
+})
+
+test('"now help alias" prints alias help message', async t => {
+  const result = await now('help', 'alias')
+
+  t.is(result.code, 0)
+  const stdout = result.stdout.split('\n')
+  t.true(stdout.length > 1)
+  t.true(stdout[1].includes(aliasHelpMessage))
+})
+
+test('"now alias --help" is the same as "now --help alias"', async t => {
+  const [result1, result2] = await Promise.all([now('alias', '--help'), now('--help', 'alias')])
+
+  t.is(result1.code, 0)
+  t.is(result1.code, result2.code)
+  t.is(result1.stdout, result2.stdout)
+})
+
+/**
+ * Run the built now binary with given arguments
+ *
+ * @param  {String} args  string arguements
+ * @return {Promise}      promise that resolves to an object {code, stdout}
+ */
+function now (...args) {
+  return new Promise((resolve, reject) => {
+    const command = path.resolve(__dirname, '../build/bin/now')
+    const now = spawn(command, args)
+
+    let stdout = ''
+    now.stdout.on('data', (data) => {
+      stdout += data
+    })
+
+    now.on('error', (err) => {
+      reject(err)
+    })
+
+    now.on('close', (code) => {
+      resolve({
+        code,
+        stdout
+      })
+    })
+  })
+}
