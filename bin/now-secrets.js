@@ -5,6 +5,7 @@ import chalk from 'chalk'
 import table from 'text-table'
 import minimist from 'minimist'
 import ms from 'ms'
+import args from 'args'
 
 // Ours
 import strlen from '../lib/strlen'
@@ -12,6 +13,18 @@ import * as cfg from '../lib/cfg'
 import {handleError, error} from '../lib/error'
 import NowSecrets from '../lib/secrets'
 import login from '../lib/login'
+
+// const parsedArgs = args
+//   .option('config', 'safdf')
+//   .option('token', 'safdf')
+//   .option('debug', 'safdf')
+//   .option('base64', 'dfadfa')
+//   .parse(process.argv)
+//
+// console.log('ARGS:', parsedArgs)
+// console.log('ARGS OBJ:', args)
+//
+// process.exit(0)
 
 const argv = minimist(process.argv.slice(2), {
   string: ['config', 'token'],
@@ -22,6 +35,9 @@ const argv = minimist(process.argv.slice(2), {
     debug: 'd',
     base64: 'b',
     token: 't'
+  },
+  unknown: (...params) => {
+    console.log('UNKNOWN:', params)
   }
 })
 
@@ -85,6 +101,8 @@ const exit = code => {
   // https://github.com/nodejs/node/issues/6456
   setTimeout(() => process.exit(code || 0), 100)
 }
+
+exit(0)
 
 if (argv.help || !subcommand) {
   help()

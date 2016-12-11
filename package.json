@@ -65,6 +65,7 @@
   },
   "dependencies": {
     "ansi-escapes": "1.4.0",
+    "args": "2.1.0",
     "arr-flatten": "1.0.1",
     "array-unique": "0.3.2",
     "async-retry": "0.2.1",
